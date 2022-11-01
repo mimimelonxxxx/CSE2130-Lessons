@@ -35,7 +35,7 @@ FILE = open("filename.ext", "a") # a indicates that the file is being opened and
 # let them access the file without actually editing the information in the file 
 ```
 
-2. Writing to a file requires the `.write(String)` dot function. Once the file is open, new content can be written into the file. 
+2. Writing to a file requires the `.write(String)` dot function. Once the file is open, new content can be written into the file. NOTE: You can only write a string to a file. 
 
 ```python 
 FILE = open("filename.ext", "w")
@@ -62,3 +62,11 @@ print(CONTENT)
 
 After the file is opened as read-only, the content can be saved as a string using the `.read()` dot function. To separate each line in the file, `.readlines()` will create a node in a list for each line in the text. 
 
+4. Updating a file requires reading a file to extract the text and then overwriting the file with the new text. 
+
+5. Deleting the content of a file uses the write argument "w" and saves a blank string. For deleting the file, the os library can remove the file. 
+
+```python
+import os
+os.remove("filename.ext")
+```
