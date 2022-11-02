@@ -40,6 +40,7 @@ def readFile(FILE_OBJ):
     :return: list->str 
     """
     TEXT = FILE_OBJ.read()
+    FILE_OBJ.close()
     SCORE_ARRAY = TEXT.split(", ")
     return SCORE_ARRAY 
 
@@ -93,12 +94,31 @@ def checkNewScore(SCORE, SCORE_LIST):
     SCORE_LIST_2D = []
     for i in range(len(SCORE_LIST)):
         SCORE_LIST_2D.append(SCORE_LIST[i].split())
-        SCORE_LIST_2D[-1][1] = int(SCORE_LIST_2D[-1][1]) # gets the number of the last node 
+        SCORE_LIST_2D[-1][1] = int(SCORE_LIST_2D[-1][1]) # gets the score of the last node 
         # Compare SCORE to SCORE_LIST 
-        for i in range(len(SCORE_LIST_2D)):
-            if SCORE >= SCORE_LIST_2D[i][1]:
+        for j in range(len(SCORE_LIST_2D)): # for each item in the list 
+            if SCORE >= SCORE_LIST_2D[j][1]: # if the score given is greater than the item 
                 return True
-        return False 
+    return False 
+
+def updateHighScore(NEW_SCORE, NEW_NAME, SCORE_ARRAY):
+    """
+    insert the new score into the appropreaite spot in the array and remove the lowest value 
+    :param NEW_SCORE: int
+    :param NEW_NAME: str
+    :param SCORE_ARRAY: list->str 
+    :return: list->str
+    """
+    SCORE_ARRAY_2D = []
+    for i in range(len(SCORE_ARRAY)):
+        SCORE_ARRAY_2D.append(SCORE_ARRAY[i].split())
+        SCORE_ARRAY_2D[-1][1] = int(SCORE_ARRAY_2D[-1][1])
+
+    for i in range(len(SCORE_ARRAY_2D)):
+        if NEW_SCORE >= SCORE_ARRAY_2D[i][1]:
+            SCORE_ARRAY.insert(i, NEW_NAME + " " + str(NEW_SCORE))
+            SCORE_ARRAY.pop()
+            return SCORE_ARRAY
 
 # OUTPUTS # 
 
@@ -111,6 +131,19 @@ def viewHighScore(SCORE_LIST):
     for i in range(len(SCORE_LIST)):
         print(f"{i+1}. {SCORE_LIST[i]}")
 
+def saveScore(SCORE_ARRAY): 
+    """
+    save the array into the file 
+    :param SCORE_ARRAY: list->str
+    :return: None
+    """
+    global FILENAME
+    FILE = open(FILENAME, "w")
+    TEXT = ", ".join(SCORE_ARRAY)
+    FILE.write(TEXT)
+    FILE.close()
+
+### MAIN PROGRAM CODE ###
 if __name__ == "__main__": 
         FILER = getFile()
         SCORE_LIST = readFile(FILER)
@@ -124,7 +157,9 @@ if __name__ == "__main__":
                 if checkNewScore(NEW_SCORE, SCORE_LIST):
                     NAME = askName()
                     print(NAME)
+                    SCORE_LIST = updateHighScore(NEW_SCORE, NAME, SCORE_LIST)
                 else: 
                     print("Better luck next time! ")
-            else: 
+            else:
+                saveScore(SCORE_LIST)
                 exit()

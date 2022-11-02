@@ -69,4 +69,21 @@ After the file is opened as read-only, the content can be saved as a string usin
 ```python
 import os
 os.remove("filename.ext")
-```
+``` 
+
+## SQLite Files 
+
+### SQLite and Python 
+
+SQLite is a library that implements a small, fast, self-contained, highly-reliable, full-featured SQL database engine. SQL stands for *Structured Query Language* and is often pronounced *sequel*, making SQLite pronounced as "SQ-Lite" or "sequel lite". While many structures of the query language are similar, there are slight deviations between SQL, SQLite, and other database structures. 
+
+### Databases are tables with column rules
+
+Databases create, update, store, and generally manage data. It can also summarize the data for reporting as information. Information is the interpretation of data for a specific shareholder. 
+
+Databases use **transactions** to manipulate data. A transaction is a group of tasks, that is the smallest possible, that manipulates data or retrieves information. An example of a transaction is withdrawing money from a bank account. 
+
+Databases will provide several advantages over using traditional text or spreadsheet files to store data: 
+
+1. **Concurrency**, where multiple entities can interact with the data at once. Entities in this case can be users, computer programs, or other databases. An integrated database can have multiple applications accessing the same database. 
+
