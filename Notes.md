@@ -87,3 +87,173 @@ Databases will provide several advantages over using traditional text or spreads
 
 1. **Concurrency**, where multiple entities can interact with the data at once. Entities in this case can be users, computer programs, or other databases. An integrated database can have multiple applications accessing the same database. 
 
+2. **Atomicity** is the property that states that a transaction performs all tasks to complete the trnasaction or it reverts so that no tasks are complete within the transaction. 
+
+3. **Consistency** is where a transaction cannot fundamentally change the structure of the database (i.e. there is a set number of columns with specific data types within the columns. A transaction cannot change the number of columns or the data types within them). 
+
+4. **Isolation** is where multiple transactions can occur in parallel, but do not affect each other. 
+
+5. **Durability** is wehre the data stored in the database can survive system failure. 
+
+All of these characteristics contribute to **data integrity** by ensuring **data validation** and **verification** with each transaction. 
+
+Databases often use an SQL system to manage the database file. (DBMS: Database management system)
+
+### Setup SQLite3 in Python3 
+
+Python is a wrapper to the SQL interface. Therefore, python can interpret SQL statements, but those statements can also be interpreted by other programs. 
+
+Note for IB: only need to include the SQL statements, not the python parts 
+
+```python
+import sqlite3
+
+FILENAME = "databaseName.db" # an alternative extension is .sqlite
+
+# Connect python to the database. If the database file doesn't exist, then creates the file
+
+CONNECTION = sqlite3.connect(FILENAME) # connects in read and write mode 
+
+# Cursor is the object that executes the SQL commands 
+
+CURSOR = CONNECTION.cursor()
+```
+
+On first run, the database file is empty, and tables must be created within the database (think of it like a spreadsheet). 
+
+### Create a Table in the Database 
+
+```python
+CURSOR.execute( # always a multi-line comment
+    """
+    CREATE TABLE student (# uppercase commands, lowercase variables
+    # every table needs a primary key, it is the index of the table, the keys are all different
+        id INTEGER PRIMARY KEY, 
+        first_name TEXT NOT NULL, 
+        last_name TEXT NOT NULL, 
+        personal_email TEXT
+    );
+    """
+)
+
+CONNECTION.commit() # validates and saves the changes to the file. 
+```
+
+Tables need a primary key, which is a unique identifier of each row of data. Each table can only have one primary key, and no two rows can share the same value for a primary key. In general, primary keys are integers, but they can be more complex when linking multiple tables together. 
+
+Each column must identify the datatype that will appear in that particular column. Common datatypes in SQLite include TEXT, INTEGER, REAL NUMBERIC (float), and BLOB. 
+
+NOT NULL is a column property that indicates that the cell cannot be blank. 
+
+UNIQUE is a column property that indicates that the cell cannot contain a value that is already foudn within the column. 
+
+### Create Data into a Table
+
+```python
+CURSOR.execute("""
+    INSERT INTO
+        student
+    VALUES (
+        1. 
+        "Michelle",
+        "Zhang",
+        "michellejiang2017@gmail.com"
+    );
+""")
+
+CONNECTION.commit()
+```
+
+NOTE that CURSOR.execute() adds the transaction to the queue, but CONNECTION.commit() validates and saves the changes. 
+
+If the data being entered into the table is arranged in an order that does not match the column order, the order of the data must be specified. Also, if the primary key column is ommitted, and the primary key is an integer value, then the table will **automatically assign** a primary key that is one higher than the highest primary key. 
+
+```python
+CURSOR.execute("""
+    INSERT INTO
+        student (
+            last_name, 
+            first_name
+        )
+    VALUES (
+        "Zhang",
+        "Michael"
+    );
+""")
+
+CONNECTION.commit()
+```
+
+#### Create Data in a Table Using Python Variables 
+
+The SQL commands are strings in python. Therefore using python techniques to insert variables into a string is possible. However, not recommended. Thus the following code block should be avoided. 
+
+```python
+INFO = ("Alice", "Wong", "alice.wong@epsb.ca")
+CURSOR.execute(f"""
+    INSERT INTO 
+        student (
+            first_name,
+            last_name,
+            email
+        )
+        VALUES (
+            {INFO[0]},
+            {INFO[1]},
+            {INFO[2]}
+        );
+""")
+# you could do a SQL attack by inserting SQL commands into the table, which is why this method is bad
+```
+
+Note that the above method of inserting variables is susceptible to SQL injection attacks that can alter data or destroy data. Instead, SQLite has an alternative method of introducing variables into the SQL command. 
+
+```python
+CURSOR.execute("""
+INSERT INTO
+    student (
+        first_name,
+        last_name,
+        email
+    )
+    VALUES (
+        ?,
+        ?,
+        ?
+    );
+""", INFO)
+
+CONNECTION.commit()
+```
+
+This method only applies to adding values (i.e. you cannot select columns using this method, because the user won't be the one selecting columns, it is the program that is doing it). Furthermore, the value must be entered as a tuple or a list (even if it is only one value). The values will replace the question marks in the order they appear. 
+
+### Read Data in a Table
+
+There are two methods of reading data in a table, returning the first row that matches the search criteria, or returning all rows that match the search criteria. 
+
+```python
+FIRST_MATCH = CURSOR.execute("""
+    SELECT
+        id,
+        first_name,
+        last_name,
+        email
+    FROM
+        student
+;""").fetchone() 
+
+print(FIRST_MATCH) # (1, Michelle, Jiang, michellejiang2017@gmail.com) 
+
+ALL_MATCHES = CURSOR.execute("""
+    SELECT
+        first_name,
+        last_name
+    FROM
+        student
+;""").fetchall()
+
+print(ALL_MATCHES) # [("Michelle", "Jiang"), ("Alice", "Wong"), ...]
+```
+
+When selecting columns, if all columns are required, an asterisk (*) is used. 
