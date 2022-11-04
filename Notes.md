@@ -95,7 +95,7 @@ Databases will provide several advantages over using traditional text or spreads
 
 5. **Durability** is wehre the data stored in the database can survive system failure. 
 
-All of these characteristics contribute to **data integrity** by ensuring **data validation** and **verification** with each transaction. 
+All of these characteristics contribute to **data integrity** by ensuring **data validation** (correct data type) and **verification** (correct value) with each transaction. 
 
 Databases often use an SQL system to manage the database file. (DBMS: Database management system)
 
@@ -129,7 +129,7 @@ CURSOR.execute( # always a multi-line comment
     CREATE TABLE student (# uppercase commands, lowercase variables
     # every table needs a primary key, it is the index of the table, the keys are all different
         id INTEGER PRIMARY KEY, 
-        first_name TEXT NOT NULL, 
+        first_name TEXT NOT NULL, # column names cannot have spaces 
         last_name TEXT NOT NULL, 
         personal_email TEXT
     );
