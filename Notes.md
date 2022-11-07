@@ -104,6 +104,7 @@ Databases often use an SQL system to manage the database file. (DBMS: Database m
 Python is a wrapper to the SQL interface. Therefore, python can interpret SQL statements, but those statements can also be interpreted by other programs. 
 
 Note for IB: only need to include the SQL statements, not the python parts 
+For IB, you only need the stuff inside the multiline comments
 
 ```python
 import sqlite3
@@ -257,3 +258,4 @@ print(ALL_MATCHES) # [("Michelle", "Jiang"), ("Alice", "Wong"), ...]
 ```
 
 When selecting columns, if all columns are required, an asterisk (*) is used. 
+

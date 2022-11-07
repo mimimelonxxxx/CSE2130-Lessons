@@ -63,4 +63,4 @@ USERS = CURSOR.execute("""
 
 print(USERS)
 
-# make sure you read and check over everything before running or else you will need to delete your database
+# make sure you read and check over everything before running or else you will need to delete your database and restart
