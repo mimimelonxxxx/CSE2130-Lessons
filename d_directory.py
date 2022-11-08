@@ -23,7 +23,7 @@ CURSOR = CONNECTION.cursor()
 
 # INPUTS # 
 
-def menu() -> int:
+def menu() -> int: # can use this syntax to check for errors 
     """
     user selects how to interact with the database 
     :return: int 
@@ -50,7 +50,9 @@ def addContact():
     EMAIL = input("Email: ")
     INSTA = input("Instagram: ")
     NEWCONTACT = [FIRSTNAME, LASTNAME, EMAIL, INSTA]
-
+    for i in range(len(NEWCONTACT)):
+        if NEWCONTACT[i] == "": # checks for blank strings 
+            NEWCONTACT[i] = None # replaces them with None so it gives an error 
     # add the contact to database 
     CURSOR.execute("""
         INSERT INTO 
@@ -69,6 +71,14 @@ def addContact():
     """, NEWCONTACT)
 
     CONNECTION.commit()
+
+def searchContactName():
+    """
+    ask for first name of contact
+    :return: str
+    """
+    NAME = input("First Name: ")
+    return NAME
 
 # PROCESSING # 
 
@@ -89,19 +99,87 @@ def setup():
         ); 
     """)
     CONNECTION.commit()
-    return
+
+def queryContactName(NAME):
+    """
+    searches the database for the contact
+    :param NAME: str
+    :return: list(tuples->str)
+    """
+    global CURSOR
+
+    RESULTS = CURSOR.execute("""
+        SELECT 
+            first_name,
+            last_name, 
+            email,
+            instagram
+        FROM
+            contacts
+        WHERE
+            first_name = ?
+        ORDER BY
+            first_name,
+            last_name;
+    """, [NAME]).fetchall() # filtering needs to go before ordering 
+    # NAME needs to be in square brackets 
+    return RESULTS
 
 # OUTPUTS # 
 
+def displayContacts():
+    """
+    prints out all contacts 
+    :return: None
+    """
+    global CURSOR
+    CONTACTS = CURSOR.execute("""
+        SELECT 
+            first_name,
+            last_name
+        FROM
+            contacts
+        ORDER BY
+            first_name,
+            last_name;
+            """).fetchall() # no one wants to see a list 
+            # fetchall() is not in alphabetical order
+            # need to use order by to sort 
+    print("All Contacts")
+    print("===============")
+    for CONTACT in CONTACTS:
+        print(CONTACT[0], CONTACT[1]) 
+
+def displayResults(RESULTS):
+    """
+    displays search results
+    :param RESULTS: list(tuples->str)
+    :return: None
+    """
+    for CONTACT in RESULTS:
+        print(f"{CONTACT[0]} {CONTACT[1]} (email: {CONTACT[2]}) (instagram: {CONTACT[3]})")
 ### MAIN PROGRAM CODE ### 
 if __name__ == "__main__": 
     pass
     # INPUTS # 
     if FIRSTRUN: 
         setup()
-    CHOICE = menu()
-    if CHOICE == 3:
-        addContact()
-    # PROCESSING # 
-    
-    # OUTPUTS # 
+    while True:
+        CHOICE = menu()
+        # PROCESSING # 
+        if CHOICE == 1:
+            NAME = searchContactName()
+            RESULT = queryContactName(NAME)
+            displayResults(RESULT)
+        elif CHOICE == 3:
+            addContact()
+        elif CHOICE == 4:
+            pass
+        elif CHOICE == 5:
+            pass
+        elif CHOICE == 6: # better to be more explicit in the code 
+            exit()
+        # OUTPUTS # 
+        elif CHOICE == 2:
+            displayContacts()
+            # IPO is better for program flow 

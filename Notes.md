@@ -259,3 +259,51 @@ print(ALL_MATCHES) # [("Michelle", "Jiang"), ("Alice", "Wong"), ...]
 
 When selecting columns, if all columns are required, an asterisk (*) is used. 
 
+### Sort Data in a Query 
+
+Sorting data in a query allows for the results to be returned in a specific order based on a column or series of columns. Ordering the data is most frequently the last part of the SQL query. 
+
+```python
+print(CURSOR.execute("""
+    SELECT 
+        *
+    FROM
+        student
+    ORDER BY
+        first_name ASC;
+""").fetchall())
+```
+
+To chain multiple columns in a sort, separate identified columns with commas (i.e. last_name ASC, first_name DESC) ASC is ascending, and DESC is descending--the default ordering is ASC, so it is only necessary to use DESC.
+
+### Filter Data in a Query
+
+Filtering allows for a partial return of the database date based upon conditions written into the query. 
+
+```python
+print(CURSOR.execute("""
+    SELECT
+        *
+    FROM
+        student
+    WHERE
+        first_name = "Michelle";
+""").fetchall())
+```
+
+NOTE: filtering data goes **BEFORE** sorting data. 
+
+SQLite uses all the same conditional operations as python does (>, <, !=, =, etc), note that equals uses one equals sign, not two. SQLite also uses common logical operators such as OR, AND, and NOT. 
+
+```python
+print(CURSOR.execute("""
+    SELECT
+        *
+    FROM
+        student
+    WHERE
+        first_name = "Michelle" 
+    AND
+        id > 5;
+""").fetchall())
+```
