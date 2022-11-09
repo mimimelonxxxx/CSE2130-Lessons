@@ -80,6 +80,85 @@ def searchContactName():
     NAME = input("First Name: ")
     return NAME
 
+def getContactID():
+    """
+    user selects an individual contact
+    :return: int -> primary key
+    """
+    global CURSOR
+    
+    CONTACTS = CURSOR.execute("""
+        SELECT
+            id,
+            first_name,
+            last_name
+        FROM
+            contacts
+        ORDER BY
+            first_name, 
+            last_name;
+    """).fetchall()
+
+    print("Please select a contact: ")
+    for i in range(len(CONTACTS)):
+        #print(f"{CONTACTS[i][0]}. {CONTACTS[i][1]} {CONTACTS[i][2]}") # id out of order 
+        print(f"{i+1}. {CONTACTS[i][1]} {CONTACTS[i][2]}")
+
+    ROWINDEX = input("> ")
+    ROWINDEX = int(ROWINDEX) - 1
+
+    CONTACTID = CONTACTS[ROWINDEX][0] # CONTACTS gives a sorted list 
+    # CONTACTID is the actual primary key of the contact 
+    return CONTACTID
+
+def updateContact(ID):
+    """
+    allow user to update an id
+    :param ID: int -> primary key
+    :return: None
+    """
+    global CURSOR, CONNECTION
+    CONTACT = CURSOR.execute("""
+        SELECT
+            first_name,
+            last_name,
+            email,
+            instagram
+        FROM
+            contacts
+        WHERE
+            id = ?;
+    """, [ID]).fetchone() # only expect one item from the id 
+    # returns a tuple, if you use .fetchall(), returns a 2D array
+    # technically don't need a ?, but it's better to be consistent 
+
+    print("Leave field blank for no changes ")
+    INFO = []
+    INFO.append(input(f"First Name: ({CONTACT[0]}) "))
+    INFO.append(input(f"Last Name: ({CONTACT[1]}) "))
+    INFO.append(input(f"Email: ({CONTACT[2]}) "))
+    INFO.append(input(f"Instagram: ({CONTACT[3]}) "))
+
+    for i in range(len(INFO)):
+        if INFO[i] == "":
+            INFO[i] = CONTACT[i]
+
+    INFO.append(ID) # id fills the last question mark
+
+    CURSOR.execute("""
+        UPDATE
+            contacts
+        SET
+            first_name = ?,
+            last_name = ?,
+            email = ?,
+            instagram = ?
+        WHERE
+            id = ?;
+    """, INFO)
+    CONNECTION.commit()
+    print(f"{INFO[0]} successfully updated! ")
+
 # PROCESSING # 
 
 def setup(): 
@@ -158,6 +237,7 @@ def displayResults(RESULTS):
     """
     for CONTACT in RESULTS:
         print(f"{CONTACT[0]} {CONTACT[1]} (email: {CONTACT[2]}) (instagram: {CONTACT[3]})")
+
 ### MAIN PROGRAM CODE ### 
 if __name__ == "__main__": 
     pass
@@ -174,7 +254,8 @@ if __name__ == "__main__":
         elif CHOICE == 3:
             addContact()
         elif CHOICE == 4:
-            pass
+            CONTACTID = getContactID()
+            updateContact(CONTACTID)
         elif CHOICE == 5:
             pass
         elif CHOICE == 6: # better to be more explicit in the code 

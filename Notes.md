@@ -224,6 +224,8 @@ INSERT INTO
     );
 """, INFO)
 
+# inserts the values into the question mark in order
+
 CONNECTION.commit()
 ```
 
@@ -307,3 +309,87 @@ print(CURSOR.execute("""
         id > 5;
 """).fetchall())
 ```
+
+SQLite can also filter from multiple values within a list 
+
+```python
+print(CURSOR.execute("""
+    SELECT
+        *
+    FROM
+        student
+    WHERE
+        first_name in ("Michelle", "Alice");
+""").fetchall())
+```
+
+ASIDE: The query results can also be limited to a set number of rows
+
+```python
+print(CURSOR.execute("""
+    SELECT
+        *
+    FROM
+        student
+    ORDER BY 
+        last_name
+    LIMIT 
+        2;
+""").fetchall())
+```
+
+#### Filter Data Using Partial Matches
+
+Partial matches are also called *"fuzzy searches"* or *"fuzzy matches"* where only part of the data needs to match the search criteria. To specify the search pattern, the following characters are allowed. 
+
+* Case sensitivity will remain for all specific characters
+
+* "_" (Underscore) to indicate a single character space that can be any character 
+
+* "%" (Percentage sign) to indicate that zero or more characters 
+
+eg: _ _ _ 2% means that there can be any 3 letters before the 2 and then anything can be after the 2 -- will match CSE2110, SST2170, MAT2971, but will not match CSE1120. (which is why you shouldn't use %2%)
+
+### Update Data in a Table 
+
+**Be cautious when updating existing information.** If the update selects multiple rows, each row will receive the new information. In general, when updating a single row, use the primary key to guarantee returning only **one** value. 
+
+```python
+CURSOR.execute("""
+    UPDATE
+        student
+    SET
+        first_name = "Mike"
+    WHERE
+        id = 2;
+""")
+
+CONNECTION.commit()
+```
+
+### Delete Data in a Table
+
+Similar to updating data in a table, use the primary key whenever possible to ensure deleting an exact row. 
+
+```python
+CURSOR.execute("""
+    DELETE FROM
+        student
+    WHERE
+        id = 2;
+""") # deletes the entire row 
+
+CONNECTION.commit()
+```
+
+#### Deleting a full table
+
+To delete a table, the entire table including its title will no longer be in the database. Therefore, any code directly relating to the table name will **output an error**. To delete a table, use the following command. 
+
+```python
+CURSOR.execute("""
+    DROP TABLE
+        student;
+""")
+```
+
