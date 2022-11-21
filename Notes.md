@@ -393,3 +393,34 @@ CURSOR.execute("""
 """)
 ```
 
+# Normalization (IB)
+
+*Normalization* adjusts the data within a table into a standard configuration so that the SQL Queries can be more easily process information. The normalization rules are developed by *Edgar Codd*, who came up with the first three rules of normalization. 
+
+## First Normalization Form (1NF)
+
+Every field in the table must be filled. (Another way of saying this is that all cells cannot be empty.)
+
+NOTE: Null cells usually do not count for 1NF. However, there is no formal rule against them. IB DOES NOT count Null as a filled cell. 
+
+Separate tables into multiple tables using the primary key (as a foreign key) to link the rows together. 
+
+## Second Normalization Form (2NF)
+
+Every column of data must be related to the primary key. The *primary key* is a unique value within a column. Unique values, which is also a column setting, are ones where the column does not have a repeated value. 
+
+NOTE: While there can be many columns set to enforce unique values, only one column (or set of columns is considered the primary key). 
+
+Typically, each table is unique for each set of data and they all match a foreign key. 
+
+## Third Normalization Form (3NF)
+
+Every column does not have secondary relational data separate from the primary key. In order words, one column cannot depend on the information of another column that is not part of the primary key. 
+
+At the end, typically you would create a conglomerate table that references all the information necessary as foreign keys. 
+
+* All tables in 2NF and 3NF have a primary key 
+
+    * Primary keys can also be a composition of two or more columns. Then the key is called a primary composite key. 
+    
+    * Foreign key is a column of primary keys from another table. The foreign key is used to create references to the other tables. 

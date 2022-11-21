@@ -204,6 +204,38 @@ def queryContactName(NAME):
     # NAME needs to be in square brackets 
     return RESULTS
 
+def deleteContact(CONTACTID):
+    """
+    deletes contact from contacts database
+    :param CONTACTID: int 
+    :return: None
+    """
+    global CURSOR, CONNECTION
+
+    CONTACT = CURSOR.execute("""
+    SELECT
+        first_name,
+        last_name
+    FROM
+        contacts
+    WHERE
+        id = ?;
+    """, [CONTACTID]).fetchone()
+
+    # DELETE
+
+    CURSOR.execute("""
+    DELETE FROM 
+        contacts
+    WHERE
+        id = ?;
+    """, [CONTACTID])
+
+    CONNECTION.commit() 
+
+    print("%s %s successfully deleted!" % CONTACT)
+    # looks at the contact tuple and replaces each %s with the value in the tuple
+    
 # OUTPUTS # 
 
 def displayContacts():
@@ -257,7 +289,8 @@ if __name__ == "__main__":
             CONTACTID = getContactID()
             updateContact(CONTACTID)
         elif CHOICE == 5:
-            pass
+            CONTACT = getContactID()
+            deleteContact(CONTACT)
         elif CHOICE == 6: # better to be more explicit in the code 
             exit()
         # OUTPUTS # 
