@@ -101,7 +101,7 @@ def getContactID():
 
     print("Please select a contact: ")
     for i in range(len(CONTACTS)):
-        #print(f"{CONTACTS[i][0]}. {CONTACTS[i][1]} {CONTACTS[i][2]}") # id out of order 
+        # print(f"{CONTACTS[i][0]}. {CONTACTS[i][1]} {CONTACTS[i][2]}") # id out of order 
         print(f"{i+1}. {CONTACTS[i][1]} {CONTACTS[i][2]}")
 
     ROWINDEX = input("> ")
