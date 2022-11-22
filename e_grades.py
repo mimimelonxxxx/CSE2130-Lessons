@@ -95,25 +95,6 @@ def getCourse():
 
     return ID
 
-# PROCESSING # 
-
-def setup(): 
-    """
-    creates the database table on first run 
-    :return: None
-    """
-    global CURSOR, CONNECTION 
-    CURSOR.execute("""
-    CREATE TABLE 
-        courses ( 
-            id TEXT NOT NULL PRIMARY KEY, 
-            name TEXT NOT NULL, 
-            category TEXT NOT NULL,
-            student_grade INTEGER 
-        ); 
-    """)
-    CONNECTION.commit()
-
 def updateGrade(COURSE):
     """
     updates grade with a new grade
@@ -151,6 +132,43 @@ def updateGrade(COURSE):
 
     print(f"{COURSE} sucessfully updated! ")
 
+# PROCESSING # 
+
+def setup(): 
+    """
+    creates the database table on first run 
+    :return: None
+    """
+    global CURSOR, CONNECTION 
+    CURSOR.execute("""
+    CREATE TABLE 
+        courses ( 
+            id TEXT NOT NULL PRIMARY KEY, 
+            name TEXT NOT NULL, 
+            category TEXT NOT NULL,
+            student_grade INTEGER 
+        ); 
+    """)
+    CONNECTION.commit()
+
+def calculateAverage():
+    """
+    calculates average of courses 
+    :return: int
+    """
+    COURSES = []
+
+    ENGLISH = "ELA201" # okay idk what im doing but basically you try english 20-1 first 
+    # and if you don't find it you go to english 20-2 and search for that 
+    ELA20 = CURSOR.execute("""
+    SELECT
+        student_grade
+    FROM
+        courses
+    WHERE
+        id = ?;
+    """, [ENGLISH]).fetchone()
+
 # OUTPUTS # 
 
 ### MAIN PROGRAM CODE ###
@@ -167,7 +185,7 @@ if __name__ == "__main__":
             COURSE = getCourse()
             updateGrade(COURSE)
         elif CHOICE == 3: # calculate average 
-            pass
+            calculateAverage()
         # OUTPUTS # 
         elif CHOICE == 4:
             exit()

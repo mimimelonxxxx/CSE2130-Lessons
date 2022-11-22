@@ -424,3 +424,56 @@ At the end, typically you would create a conglomerate table that references all 
     * Primary keys can also be a composition of two or more columns. Then the key is called a primary composite key. 
     
     * Foreign key is a column of primary keys from another table. The foreign key is used to create references to the other tables. 
+
+## Joining Tables
+
+With normalized tables separating data, there are many instances where a query will need data from two or more tables. Instead of performing multiple queries sequentially (for example, query a student then use the student's id as a foreign key to query the course name that the student is taking), tables can be joined together using the foreign key column to return rows in the table where the foreign key is the primary key. Therefore, one query can return results from multiple tables. It is possible to join any number of tables together. 
+
+```python
+
+# Use the student table from above.
+
+CURSOR.execute("""
+    CREATE TABLE
+        course (
+            course_id TEXT PRIMARY KEY,
+            course_name TEXT NOT NULL
+        );
+""")
+
+# create a composite primary key 
+CURSOR.execute("""
+    CREATE TABLE 
+        student_schedule (
+            student_id INTEGER,
+            course_id TEXT,
+            course_room INTEGER,
+            PRIMARY KEY (student_id, course_id)
+        );
+""")
+
+# assume that data is in the tables 
+
+## Joining tables
+
+ROWS = CURSOR.execute("""
+    SELECT
+        student.first_name,
+        student.last_name,
+        course.course_name,
+        student_schedule.course_room
+    FROM
+        student_schedule
+    JOIN
+        student
+    ON
+        student_schedule.student_id = student.id 
+    JOIN 
+        course
+    ON
+        student_schedule.course_id = course.course_id
+    WHERE
+        student_schedule.student_id = 7;
+""").fetchall()
+```
+
