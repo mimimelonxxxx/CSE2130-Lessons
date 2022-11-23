@@ -20,11 +20,11 @@ def getFileContent(FILENAME) -> list:
     FILE = open(FILENAME)
     TEXTLIST = FILE.readlines()
     FILE.close()
-    # ??? why doesnt this work
+
     # clean up data
     for i in range(len(TEXTLIST)):
         if TEXTLIST[i][-1] == "\n":
-            TEXTLIST[i] = TEXTLIST[:-1] # until the last character
+            TEXTLIST[i] = TEXTLIST[i][:-1] # until the last character
         TEXTLIST[i] = TEXTLIST[i].split(",")
         for j in range(len(TEXTLIST[i])):
             if TEXTLIST[i][j].isnumeric():
@@ -43,7 +43,7 @@ Choose an option,
 2. Search for a pokemon weakness (not very effective)
 3. Exit
     """)
-    CHOICE = input("> ")
+    CHOICE = int(input("> "))
     return CHOICE
 
 def getPokemonName() -> str:
@@ -101,7 +101,7 @@ def setupStrongTypes(LIST) -> None:
     for i in range(len(LIST)):
         for j in range(len(LIST[i])):
             if LIST[i][j] == "":
-                LIST[i][j] == None
+                LIST[i][j] = None
 
     CURSOR.execute("""
         CREATE TABLE
@@ -131,9 +131,50 @@ def setupStrongTypes(LIST) -> None:
 
     CONNECTION.commit()
 
-def getPokemonStrengths(POKEMON):
+def setupWeakTypes(LIST) -> None:
     """
-    queries the database for pokemon type strenghts
+    load and import pokemon strengths
+    :param LIST: list
+    :return: None
+    """
+    global CONNECTION, CURSOR
+
+    for i in range(len(LIST)):
+        for j in range(len(LIST[i])):
+            if LIST[i][j] == "":
+                LIST[i][j] = None
+
+    CURSOR.execute("""
+        CREATE TABLE
+            weak (
+                type TEXT PRIMARY KEY,
+                type_1 TEXT,
+                type_2 TEXT,
+                type_3 TEXT,
+                type_4 TEXT,
+                type_5 TEXT
+            );
+    """)
+
+    for i in range(1, len(LIST)):
+        CURSOR.execute("""
+            INSERT INTO
+                weak
+            VALUES (
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?
+            )
+        """, LIST[i])
+
+    CONNECTION.commit()
+
+def getPokemonStrengths(POKEMON) -> list:
+    """
+    queries the database for pokemon type strengths
     :param POKEMON: str
     :return: list 
     """
@@ -142,9 +183,9 @@ def getPokemonStrengths(POKEMON):
         SELECT
             strong.type_1,
             strong.type_2,
-            strong.type_3,
-            strong.type_4,
-            strong.type_5
+            type_3,
+            type_4,
+            type_5
         FROM
             pokemon
         JOIN
@@ -176,13 +217,78 @@ def getPokemonStrengths(POKEMON):
     for i in range(len(TYPE1STRONG)):
         if TYPE1STRONG[i] is not None:
             STRENGTHS.append(TYPE1STRONG[i])
-    if TYPE2STRONG is not None:
+    if TYPE2STRONG[i] is not None:
         for i in range(len(TYPE2STRONG)):
-            if TYPE2STRONG[i] is not None and TYPE2STRONG not in STRENGTHS:
+            if TYPE2STRONG[i] is not None and TYPE2STRONG[i] not in STRENGTHS:
                 STRENGTHS.append(TYPE2STRONG[i])
     return STRENGTHS
 
+def getPokemonWeaknesses(POKEMON) -> list:
+    """
+    queries the database for pokemon type weaknesses
+    :param POKEMON: str
+    :return: list 
+    """
+    global CURSOR
+    TYPE1WEAK = CURSOR.execute("""
+        SELECT
+            weak.type_1,
+            weak.type_2,
+            type_3,
+            type_4,
+            type_5
+        FROM
+            pokemon
+        JOIN
+            weak
+        ON
+            weak.type = pokemon.type_1
+        WHERE
+            name = ?;
+    """, [POKEMON]).fetchone()
+
+    TYPE2WEAK = CURSOR.execute("""
+        SELECT 
+            weak.type_1,
+            weak.type_2,
+            type_3,
+            type_4,
+            type_5
+        FROM 
+            pokemon
+        JOIN
+            weak
+        ON
+            weak.type = pokemon.type_2
+        WHERE
+            name = ?;
+    """, [POKEMON]).fetchone()
+
+    WEAKNESSES = []
+    for i in range(len(TYPE1WEAK)):
+        if TYPE1WEAK[i] is not None:
+            WEAKNESSES.append(TYPE1WEAK[i])
+    if TYPE2WEAK[i] is not None:
+        for i in range(len(TYPE2WEAK)):
+            if TYPE2WEAK[i] is not None and TYPE2WEAK[i] not in WEAKNESSES:
+                WEAKNESSES.append(TYPE2WEAK[i])
+    return WEAKNESSES
+
 # OUTPUTS # 
+
+def displayPokemonStrengths(NAME, RESULTS) -> None:
+    """
+    displays the pokemons strengths 
+    :param NAME: str
+    :param RESULTS: list
+    :return: None
+    """
+
+    if len(RESULTS) > 0:
+        RESULTS = ", ".join(RESULTS) # joins results into string 
+        print(f"{NAME} is strong against the following types: {RESULTS}. ")
+    else:
+        print(f"{NAME} was not found or is not super effective against any types. ")
 
 ### VARIABLES ###
 
@@ -196,17 +302,26 @@ CONNECTION = sqlite3.connect(DATABASEFILE)
 CURSOR = CONNECTION.cursor()
 
 ### MAIN PROGRAM CODE ###
-if __name__ == "___main___":
-    pass
+if __name__ == "__main__":
     # INPUTS # 
     if FIRSTRUN:
         CONTENT = getFileContent("pokemon_no_mega.csv")
         setupPokemon(CONTENT)
         TYPES = getFileContent("pokemon_type_strong.csv")
         setupStrongTypes(TYPES)
+        WEAKNESSES = getFileContent("pokemon_type_weak.csv")
+        setupWeakTypes(TYPES)
     # PROCESSING # 
-    CHOICE = menu()
-    if CHOICE == 1:
-        POKEMON = getPokemonName()
-        STRENGTHS = getPokemonStrengths(POKEMON)
-    # OUTPUT # 
+    while True:
+        CHOICE = menu()
+        if CHOICE == 1:
+            POKEMON = getPokemonName()
+            RESULTS = getPokemonStrengths(POKEMON)
+        if CHOICE == 2:
+            POKEMON = getPokemonName()
+            RESULTS = getPokemonWeaknesses(POKEMON)
+        # OUTPUT # 
+        else:
+            print("Goodbye! ")
+            exit()
+        displayPokemonStrengths(POKEMON, RESULTS)
