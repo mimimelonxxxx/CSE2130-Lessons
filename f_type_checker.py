@@ -72,8 +72,11 @@ def setupPokemon(LIST) -> None:
             type_2 TEXT
             );
     """)
-
+    
     for i in range(1, len(LIST)):
+        LIST[i][2] = LIST[i][2].lower()
+        LIST[i][3] = LIST[i][3].lower()
+
         CURSOR.execute("""
             INSERT INTO
                 pokemon
@@ -151,6 +154,33 @@ def getPokemonStrengths(POKEMON):
         WHERE
             name = ?;
     """, [POKEMON]).fetchone()
+
+    TYPE2STRONG = CURSOR.execute("""
+        SELECT 
+            strong.type_1,
+            strong.type_2,
+            type_3,
+            type_4,
+            type_5
+        FROM 
+            pokemon
+        JOIN
+            strong
+        ON
+            strong.type = pokemon.type_2
+        WHERE
+            name = ?;
+    """, [POKEMON]).fetchone()
+
+    STRENGTHS = []
+    for i in range(len(TYPE1STRONG)):
+        if TYPE1STRONG[i] is not None:
+            STRENGTHS.append(TYPE1STRONG[i])
+    if TYPE2STRONG is not None:
+        for i in range(len(TYPE2STRONG)):
+            if TYPE2STRONG[i] is not None and TYPE2STRONG not in STRENGTHS:
+                STRENGTHS.append(TYPE2STRONG[i])
+    return STRENGTHS
 
 # OUTPUTS # 
 
