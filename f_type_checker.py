@@ -276,19 +276,26 @@ def getPokemonWeaknesses(POKEMON) -> list:
 
 # OUTPUTS # 
 
-def displayPokemonStrengths(NAME, RESULTS) -> None:
+def displayPokemonStrengths(NAME, RESULTS, STRENGTH) -> None:
     """
     displays the pokemons strengths 
     :param NAME: str
     :param RESULTS: list
     :return: None
     """
-
-    if len(RESULTS) > 0:
-        RESULTS = ", ".join(RESULTS) # joins results into string 
-        print(f"{NAME} is strong against the following types: {RESULTS}. ")
+    if STRENGTH:
+        if len(RESULTS) > 0:
+            RESULTS = ", ".join(RESULTS) # joins results into string 
+            print(f"{NAME} is strong against the following types: {RESULTS}. ")
+        else:
+            print(f"{NAME} was not found or is not super effective against any types. ")
     else:
-        print(f"{NAME} was not found or is not super effective against any types. ")
+        if len(RESULTS) > 0:
+            RESULTS = ", ".join(RESULTS) # joins results into string 
+            print(f"{NAME} is weak to the following types: {RESULTS}. ")
+        else:
+            print(f"{NAME} was not found or is not weak to any types. ")
+
 
 ### VARIABLES ###
 
@@ -317,11 +324,13 @@ if __name__ == "__main__":
         if CHOICE == 1:
             POKEMON = getPokemonName()
             RESULTS = getPokemonStrengths(POKEMON)
+            STRENGTH = True
         if CHOICE == 2:
             POKEMON = getPokemonName()
             RESULTS = getPokemonWeaknesses(POKEMON)
+            STRENGTH = False
         # OUTPUT # 
         else:
             print("Goodbye! ")
             exit()
-        displayPokemonStrengths(POKEMON, RESULTS)
+        displayPokemonStrengths(POKEMON, RESULTS, STRENGTH)
