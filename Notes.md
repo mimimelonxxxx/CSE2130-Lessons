@@ -477,3 +477,124 @@ ROWS = CURSOR.execute("""
 """).fetchall()
 ```
 
+# WHATS ON THE TEST
+
+It's okay to have small mistakes (eg: semicolon, commas)
+
+1. Create a database 
+
+2. input data into database
+
+3. query databases: filter, order by
+
+4. join databases 
+
+## Additional IB Notes
+
+### Terminology
+
+- **Data Definition Language (DDL)**: a language that can create, modify, and manage the structure of databases. (Examples include MS SQL, MySQL, and SQLITE)
+
+- **Relational Database Management System (RDBMS)**: a database management system that allows users to identify and access data *in relation* to another piece of data in the database. SQLite is a RDBMS as it allows joining multiple tables together. 
+
+- **Secondary Key**: an additional column within a table that enforces unique values that can be used to identify a single row.
+
+- **Candidate Keys**: any column that can be used to identify a single row. Primary and secondary keys are candidate keys (assuming that the primary key is not composite). 
+
+- **Referential Integrity**: where tables in a database refer to each other using primary keys within each table. When designing data storage, tables are joined by only using foreign keys. 
+
+- **Simple vs Complex Queries**: Simple queries access a small number of tables within a small number of filters (often one table and one filter). Complex queries access multiple tables, often with joins, and often use multiple filters. Complex queries may also use subqueries (EXTRA: make a query, and then select another query with those results). 
+
+- **Data Matching**: the process of comparing two separate tables/databases for the purpose of verification and/or validation. For example, two tables can be compared to identify duplicate data. 
+
+- **Data Mining**: The process of analyzing data sets to identify anomalies or patterns that may predict future outcomes. (This is where the money is) (Machine learning and AI are used to data mine efficiently) Eg: Trends in school grades
+
+### Schema
+
+The structure of when we create a table. 
+
+A database schema defines how data is organized within a relational database; this is inclusive of logical constraints such as table names, fields, data types, and the relationships between entities. 
+
+- **Conceptual Schemas**, which offter a big-picture view of what the system will contain, how it will be organized, and which business rule are involved. These are often created in the planning process and are represented by UML tables. 
+
+- **Logical Schemas**, which are clearly defined schema objects of information, such as table names, field names, entity relationships, and integrity constraints. SQL commands are written as logical schemas.
+
+- **Physical Schemas** provide the technical information such as where the data is being stored. 
+
+### Data Dictionaries 
+
+When designing databases, data dictionaries formalize what the expected data is within each table column. Data dictionaries include the metadata of the column. 
+
+| Data Table |  |  |  |
+| --- | --- | --- | --- | 
+| **id** | **first_name** | **last_name** | **dept_id** | 
+| 1234567 | Michael | Zhang | 344 | 
+
+| Data Dictionary |||
+| --- | --- | --- | 
+| **column** | **data_type** | **description** | 
+| id | integer | primary key of the table | 
+| first_name | text/varchar(32) | first name of the employee |
+| last_name | text/varchar(32) | last name of the employee, cannot be empty | 
+| dept_id | integer | employee department (foreign key) | 
+
+IB cares more about the design and enterprise of data 
+
+### Relationship Types 
+
+When referencing data between tables, there are three main relationships between entities. 
+
+1. __one-to-one__, where one row in one table will relate to none, or one row in the referenced table. (This relationship normally enforces a business rule). (eg: students are only allowed to take a course once per semester)
+
+2. __one-to-many__, where one row in one table will relate to none, one, or many rows in the referenced table. (This is the most common entity relation). (Only goes one way)
+
+3. __many-to-many__, where rows in both tables can relate to none, one, or many rows in the other table. 
+
+### Derived Columns 
+
+Often called _generated columns_ or _computed columns_, derived columns are columns within a table that is calculated from data found in other columns. 
+
+```python
+CURSOR.execute("""
+    CREATE TABLE
+        contacts (
+            id INTEGER PRIMARY KEY,
+            first_name TEXT NOT NULL,
+            last_name TEXT NOT NULL, 
+            full_name TEXT GENERATED ALWAYS AS (
+                first_name || " " || last_name
+            ),
+            email TEXT
+        );
+""")
+# NOTE: || concatenates two strings in SQL. int/real use regular mathematical operations (+, *, etc)
+
+CURSOR.execute("""
+    INSERT INTO
+        contacts (
+            first_name,
+            last_name,
+            email
+        )
+    VALUES (
+        "Michelle",
+        "Jiang",
+        "michellejiang2017@gmail.com"
+    );
+""")
+
+print(CURSOR.execute("""
+    SELECT 
+        full_name
+    FROM
+        contacts;
+""").fetchone()) # prints Michelle Jiang
+```
+
+If you want a float in the SQL database the type is REAL, not float. 
+
+### Data Warehousing 
+
+A __data warehouse__ is an enterprise system that aggregates data from different sources into a single, central, consistent data store. This data can be stored in a structured or semi-structured system where data is managed from multiple sources. Examples of data warehousing is point-of-sales transactions, marketing automation, and customer relations management. 
+
+Other uses of a data warehouse is for data mining, AI, and machine learning. 
